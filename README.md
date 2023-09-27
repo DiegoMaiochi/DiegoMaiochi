@@ -2,14 +2,6 @@
 
 - Diego Maiochi, 21 anos, Cianorte / PR
 
-## Gostos ✌️😎
-- Tecnologia
-- Programação
-- Eletronica
-- Computadores 
-- Música
-- Academia
-
 ## Contatos 🙋‍♂️
 - E-mail: diegoabreu382@gmail.com
 - Instagram: [@diego_maiochi](https://www.instagram.com/diego_maiochi/)
