@@ -11,7 +11,6 @@ Este perfil é onde compartilho projetos, estudos, experimentos e tudo o que est
 ## 🛠️ Ferramentas & Tecnologias
 
 - React
-- TypeScript
 - JavaScript
 - Tailwind CSS
 - Versionamento com Git
