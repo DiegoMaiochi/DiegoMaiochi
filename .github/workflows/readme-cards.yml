@@ -9,7 +9,7 @@ on:
       - profile.json
       - scripts/**
       - fonts/**
-      - data/portrait.txt
+      - assets/**
       - .github/workflows/readme-cards.yml
 
 permissions:

@@ -1,6 +1,6 @@
 """Render the animated SVG cards for the profile README.
 
-Reads profile.json, data/github.json and data/portrait.txt, writes cards/*.svg
+Reads profile.json, data/github.json and assets/portrait.webp, writes cards/*.svg
 and refreshes the card block in README.md (between the cards:start/end
 markers; everything outside the markers is left alone).
 
@@ -241,11 +241,11 @@ def level(count: int, q: list[int]) -> int:
 # ---------------------------------------------------------------- cards
 
 
-def hero(profile: dict, portrait: list[str]) -> str:
+def hero(profile: dict, portrait: bytes | None) -> str:
     W, H = 840, 320
     parts = []
 
-    # Terminal window with the ASCII portrait printing in row by row.
+    # Terminal window with the portrait printing in band by band.
     px, py, pw, ph = 24, 24, 280, 272
     parts.append(
         f'<rect x="{px}" y="{py}" width="{pw}" height="{ph}" rx="12" fill="{PANEL}" stroke="{BORDER}"/>'
@@ -255,25 +255,41 @@ def hero(profile: dict, portrait: list[str]) -> str:
         parts.append(f'<circle cx="{px + 18 + i * 16}" cy="{py + 14}" r="5" fill="{c}"/>')
     parts.append(t(px + pw - 14, py + 18, "~/retrato", 11, DIM, MONO, anchor="end"))
 
+    portrait_css = ""
     if portrait:
-        cols = max(len(r) for r in portrait)
-        size = min((pw - 28) / (cols * 0.6), (ph - 48) / (len(portrait) * 1.08))
-        lh = size * 1.08
-        ox = px + (pw - cols * size * 0.6) / 2
-        oy = py + 28 + (ph - 28 - len(portrait) * lh) / 2 + size * 0.8
-        parts.append(
-            f'<linearGradient id="pg" gradientUnits="userSpaceOnUse" x1="0" y1="{py + 30}" x2="0" y2="{py + ph}">'
-            f'<stop offset="0" stop-color="{INK}"/><stop offset=".6" stop-color="{SOFT}"/>'
-            f'<stop offset="1" stop-color="{DIM}"/></linearGradient>'
+        # Circular portrait; bands of panel colour cover it and fade away one
+        # after another top to bottom, with a scan line riding the edge.
+        r = 106
+        cx, cy = px + pw / 2, py + 28 + (ph - 28) / 2
+        top = cy - r
+        bands = 22
+        bh = 2 * r / bands
+        band_step = 0.045
+        reveal_start = T_HERO + 0.25
+        mime = "image/webp" if portrait[:4] == b"RIFF" else "image/png"
+        b64 = base64.b64encode(portrait).decode()
+        covers = "".join(
+            f'<rect class="band" style="{d(reveal_start + i * band_step)}" x="{cx - r:.1f}" '
+            f'y="{top + i * bh:.2f}" width="{2 * r}" height="{bh + 0.6:.2f}" fill="{PANEL}"/>'
+            for i in range(bands)
         )
-        rows = []
-        for i, row in enumerate(portrait):
-            rows.append(
-                f'<text class="fi" style="{d(T_HERO + 0.25 + i * 0.03)}" x="{ox:.1f}" '
-                f'y="{oy + i * lh:.1f}" xml:space="preserve">{escape(row)}</text>'
-            )
         parts.append(
-            f'<g font-family="{MONO}" font-size="{size:.2f}" fill="url(#pg)">{"".join(rows)}</g>'
+            f'<clipPath id="pc"><circle cx="{cx}" cy="{cy}" r="{r}"/></clipPath>'
+            f'<g clip-path="url(#pc)">'
+            f'<image href="data:{mime};base64,{b64}" x="{cx - r}" y="{top}" '
+            f'width="{2 * r}" height="{2 * r}" preserveAspectRatio="xMidYMid slice"/>'
+            f"{covers}"
+            f'<rect class="scan" x="{cx - r}" y="{top}" width="{2 * r}" height="2" fill="{ACCENT}"/>'
+            f"</g>"
+            f'<circle cx="{cx}" cy="{cy}" r="{r + 0.5}" fill="none" stroke="{BORDER}" stroke-width="1.5"/>'
+        )
+        scan_dur = bands * band_step
+        portrait_css = (
+            ".band{opacity:0;animation:band .35s ease-out both}"
+            "@keyframes band{from{opacity:1}to{opacity:0}}"
+            f".scan{{opacity:0;animation:scan {scan_dur:.2f}s linear {reveal_start:.2f}s both}}"
+            f"@keyframes scan{{0%{{opacity:1;transform:translateY(0)}}"
+            f"90%{{opacity:1}}100%{{opacity:0;transform:translateY({2 * r}px)}}}}"
         )
 
     # Right column.
@@ -348,7 +364,7 @@ def hero(profile: dict, portrait: list[str]) -> str:
         f'<rect class="blink" x="{x + 13}" y="{by + 8}" width="2" height="15" fill="{ACCENT}"/>'
         f"</g></g>"
     )
-    css = (
+    css = portrait_css + (
         f".typer{{transform:translateX({cw:.1f}px);animation:type {type_dur:.2f}s steps({chars}) "
         f"{type_start:.2f}s both}}"
         f"@keyframes type{{from{{transform:translateX(0)}}to{{transform:translateX({cw:.1f}px)}}}}"
@@ -701,8 +717,8 @@ def main() -> None:
     else:
         sys.exit("data/github.json not found: run scripts/fetch_data.py first (or use --sample)")
 
-    portrait_path = ROOT / "data" / "portrait.txt"
-    portrait = portrait_path.read_text(encoding="utf-8").rstrip("\n").split("\n") if portrait_path.exists() else []
+    portrait_path = ROOT / "assets" / "portrait.webp"
+    portrait = portrait_path.read_bytes() if portrait_path.exists() else None
 
     stats = compute_stats(data)
     out.mkdir(parents=True, exist_ok=True)
