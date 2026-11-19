@@ -34,18 +34,19 @@ STATIC = os.environ.get("STATIC") == "1"
 
 # ---------------------------------------------------------------- palette
 
-BG = "#0B1120"
-PANEL = "#111A2E"
-BORDER = "#1E2A44"
-INK = "#E5ECF6"
-MUTED = "#8A9BB8"
-DIM = "#4A5878"
-CYAN = "#38BDF8"
-YELLOW = "#FACC15"
-VIOLET = "#A78BFA"
-ORANGE = "#FB923C"
-GRAPH_LEVELS = ["#16213A", "#0C4A6E", "#0369A1", "#0EA5E9", "#7DD3FC"]
-BAR = "#24324F"
+# Neutral graphite, like a dark editor/chat UI, with one warm accent used
+# sparingly (cursor, prompt, live dots, keywords).
+BG = "#191919"
+PANEL = "#222222"
+BORDER = "#303030"
+INK = "#EFEFEF"
+SOFT = "#C4C4C4"
+MUTED = "#9A9A9A"
+DIM = "#626262"
+ACCENT = "#D97757"
+GRAPH_LEVELS = ["#262626", "#474747", "#767676", "#ADADAD", "#EFEFEF"]
+BAR = "#333333"
+STAT_BAR = "#4A4A4A"
 
 MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
 WEEKDAYS = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"]
@@ -250,7 +251,7 @@ def hero(profile: dict, portrait: list[str]) -> str:
         f'<rect x="{px}" y="{py}" width="{pw}" height="{ph}" rx="12" fill="{PANEL}" stroke="{BORDER}"/>'
         f'<path d="M{px} {py + 28}h{pw}" stroke="{BORDER}"/>'
     )
-    for i, c in enumerate(("#F87171", "#FBBF24", "#34D399")):
+    for i, c in enumerate(("#3A3A3A", "#3A3A3A", "#3A3A3A")):
         parts.append(f'<circle cx="{px + 18 + i * 16}" cy="{py + 14}" r="5" fill="{c}"/>')
     parts.append(t(px + pw - 14, py + 18, "~/retrato", 11, DIM, MONO, anchor="end"))
 
@@ -262,8 +263,8 @@ def hero(profile: dict, portrait: list[str]) -> str:
         oy = py + 28 + (ph - 28 - len(portrait) * lh) / 2 + size * 0.8
         parts.append(
             f'<linearGradient id="pg" gradientUnits="userSpaceOnUse" x1="0" y1="{py + 30}" x2="0" y2="{py + ph}">'
-            f'<stop offset="0" stop-color="{INK}"/><stop offset=".55" stop-color="{CYAN}"/>'
-            f'<stop offset="1" stop-color="{VIOLET}"/></linearGradient>'
+            f'<stop offset="0" stop-color="{INK}"/><stop offset=".6" stop-color="{SOFT}"/>'
+            f'<stop offset="1" stop-color="{DIM}"/></linearGradient>'
         )
         rows = []
         for i, row in enumerate(portrait):
@@ -279,7 +280,7 @@ def hero(profile: dict, portrait: list[str]) -> str:
     x = 340
     parts.append(
         f'<g class="fu" style="{d(T_HERO + 0.1)}">'
-        + t(x, 74, "> whoami", 13, CYAN, MONO)
+        + t(x, 74, "> whoami", 13, ACCENT, MONO)
         + "</g>"
     )
     parts.append(
@@ -296,9 +297,9 @@ def hero(profile: dict, portrait: list[str]) -> str:
     parts.append(
         f'<clipPath id="nameclip">{t(x, 164, name, name_size, INK, SANS, 700)}</clipPath>'
         f'<linearGradient id="shine" x1="0" x2="1" y1="0" y2="0">'
-        f'<stop offset="0" stop-color="{CYAN}" stop-opacity="0"/>'
-        f'<stop offset=".5" stop-color="{CYAN}" stop-opacity=".95"/>'
-        f'<stop offset="1" stop-color="{CYAN}" stop-opacity="0"/></linearGradient>'
+        f'<stop offset="0" stop-color="{ACCENT}" stop-opacity="0"/>'
+        f'<stop offset=".5" stop-color="{ACCENT}" stop-opacity=".9"/>'
+        f'<stop offset="1" stop-color="{ACCENT}" stop-opacity="0"/></linearGradient>'
         f'<g class="fu" style="{d(T_HERO + 0.4)}">'
         + t(x, 164, name, name_size, INK, SANS, 700)
         + f'<g clip-path="url(#nameclip)"><rect class="shine" x="{x}" y="100" width="110" '
@@ -308,8 +309,8 @@ def hero(profile: dict, portrait: list[str]) -> str:
     # Role with a pulsing dot.
     parts.append(
         f'<g class="fu" style="{d(T_HERO + 0.55)}">'
-        f'<circle cx="{x + 6}" cy="{198}" r="5" fill="{CYAN}"/>'
-        f'<circle class="pulse" cx="{x + 6}" cy="{198}" r="5" fill="none" stroke="{CYAN}" stroke-width="1.5"/>'
+        f'<circle cx="{x + 6}" cy="{198}" r="5" fill="{ACCENT}"/>'
+        f'<circle class="pulse" cx="{x + 6}" cy="{198}" r="5" fill="none" stroke="{ACCENT}" stroke-width="1.5"/>'
         + t(x + 24, 204, profile["role"], 18, INK, SANS, 500)
         + "</g>"
     )
@@ -344,7 +345,7 @@ def hero(profile: dict, portrait: list[str]) -> str:
         f'<clipPath id="codeclip"><rect x="{x + 1}" y="{by + 1}" width="{box_w - 2:.1f}" height="28" rx="7"/></clipPath>'
         f'<g clip-path="url(#codeclip)"><g class="typer">'
         f'<rect x="{x + 12}" y="{by + 3}" width="{cw + 4:.1f}" height="24" fill="{PANEL}"/>'
-        f'<rect class="blink" x="{x + 13}" y="{by + 8}" width="2" height="15" fill="{CYAN}"/>'
+        f'<rect class="blink" x="{x + 13}" y="{by + 8}" width="2" height="15" fill="{ACCENT}"/>'
         f"</g></g>"
     )
     css = (
@@ -364,15 +365,15 @@ def highlight(code: str) -> str:
     out = []
     for tok in re.findall(r"'[^']*'|\"[^\"]*\"|\w+|\s+|.", code):
         if tok in ("const", "let", "var", "function", "return", "new"):
-            c = VIOLET
+            c = ACCENT
         elif tok[:1] in "'\"":
-            c = YELLOW
+            c = SOFT
         elif tok in ("true", "false", "null") or tok.isdigit():
-            c = ORANGE
+            c = ACCENT
         elif re.fullmatch(r"\w+", tok):
-            c = CYAN if not out else INK
+            c = INK
         else:
-            c = MUTED
+            c = DIM
         out.append(f'<tspan fill="{c}">{escape(tok)}</tspan>')
     return "".join(out)
 
@@ -390,7 +391,7 @@ def graph(stats: dict) -> str:
         + t(28, 62, "no último ano", 13, MUTED, SANS, 500)
         + "</g>",
         f'<g class="fu" style="{d(T_GRAPH + 0.1)}">'
-        + t(W - 28, 50, fmt(stats["total"]), 34, CYAN, SANS, 700, "end")
+        + t(W - 28, 50, fmt(stats["total"]), 34, INK, SANS, 700, "end")
         + "</g>",
     ]
     if days:
@@ -458,10 +459,9 @@ def tile(label: str, value: int, caption: str, color: str, delay: float) -> str:
         f'<stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>'
         f'<g class="swing" style="{d(delay)}">'
         f'<rect x="1" y="1" width="{W - 2}" height="{H - 2}" rx="15" fill="{PANEL}" stroke="{BORDER}"/>'
-        f'<rect x="1" y="1" width="{W - 2}" height="4" fill="{color}" clip-path="url(#tc)"/>'
-        f'<circle cx="{W - 26}" cy="30" r="6" fill="{color}"/>'
-        f'<circle class="pulse" style="{d(delay + 0.9)}" cx="{W - 26}" cy="30" r="6" fill="none" stroke="{color}" stroke-width="1.5"/>'
-        + t(24, 36, label, 12, color, MONO, 700, extra='letter-spacing="1.5"')
+        f'<circle cx="{W - 26}" cy="31" r="4.5" fill="{color}"/>'
+        f'<circle class="pulse" style="{d(delay + 0.9)}" cx="{W - 26}" cy="31" r="4.5" fill="none" stroke="{color}" stroke-width="1.5"/>'
+        + t(24, 36, label, 12, MUTED, MONO, 700, extra='letter-spacing="1.5"')
         + "".join(nums)
         + t(24, 126, caption, 13, MUTED, SANS, 500)
         + f'<g class="nudge" style="{d(delay + 1.6)}">'
@@ -501,27 +501,27 @@ def activity(stats: dict) -> str:
     for i, ((y, m), v) in enumerate(months):
         h = max(3, chart_h * v / top) if v else 3
         bx = chart_x + i * slot + (slot - bw) / 2
-        color = CYAN if i == best else BAR
+        color = INK if i == best else BAR
         parts.append(
             f'<rect class="grow" style="{d(T_ACTIVITY + 0.2 + i * 0.06)}" x="{bx:.1f}" '
             f'y="{base - h:.1f}" width="{bw:.1f}" height="{h:.1f}" rx="4" fill="{color}"/>'
         )
         parts.append(
-            t(bx + bw / 2, base + 18, MONTHS[m - 1], 10, CYAN if i == best else DIM, MONO, anchor="middle")
+            t(bx + bw / 2, base + 18, MONTHS[m - 1], 10, INK if i == best else DIM, MONO, anchor="middle")
         )
         if i == best and v:
             parts.append(
                 f'<g class="pop" style="{d(T_ACTIVITY + 1.2)}">'
-                + t(bx + bw / 2, base - h - 8, fmt(v), 13, CYAN, SANS, 700, "middle")
+                + t(bx + bw / 2, base - h - 8, fmt(v), 13, INK, SANS, 700, "middle")
                 + "</g>"
             )
 
     bd, bc = stats["best_day"]
     rows = [
-        ("Sequência atual", f"{stats['current_streak']} {'dia' if stats['current_streak'] == 1 else 'dias'}", CYAN),
-        ("Dias ativos", f"{stats['active_days']} de {len(stats['days'])}", YELLOW),
-        ("Melhor dia", f"{bd.day} {MONTHS[bd.month - 1]} · {bc}", VIOLET),
-        ("Dia favorito", WEEKDAYS[stats["fav_weekday"]], ORANGE),
+        ("Sequência atual", f"{stats['current_streak']} {'dia' if stats['current_streak'] == 1 else 'dias'}", ACCENT),
+        ("Dias ativos", f"{stats['active_days']} de {len(stats['days'])}", STAT_BAR),
+        ("Melhor dia", f"{bd.day} {MONTHS[bd.month - 1]} · {bc}", STAT_BAR),
+        ("Dia favorito", WEEKDAYS[stats["fav_weekday"]], STAT_BAR),
     ]
     sx = 572
     for i, (label, value, color) in enumerate(rows):
@@ -549,7 +549,7 @@ def stack(profile: dict) -> str:
         chips.append(
             f'<g class="pop" style="{d(T_STACK + 0.15 + i * 0.09)}">'
             f'<rect x="{x:.1f}" y="{y}" width="{w:.1f}" height="{chip_h}" rx="17" fill="{PANEL}" stroke="{BORDER}"/>'
-            f'<circle cx="{x + pad + 4:.1f}" cy="{y + chip_h / 2}" r="4.5" fill="{item["color"]}"/>'
+            f'<circle cx="{x + pad + 4:.1f}" cy="{y + chip_h / 2}" r="4.5" fill="{item.get("color") or MUTED}"/>'
             + t(x + pad + 16, y + 22, item["name"], 14, INK, SANS, 500)
             + "</g>"
         )
@@ -591,7 +591,7 @@ def repo_card(repo: dict, delay: float) -> str:
     fx = 24
     fy = H - 22
     if lang.get("name"):
-        parts.append(f'<circle cx="{fx + 5}" cy="{fy - 4}" r="5" fill="{lang.get("color") or MUTED}"/>')
+        parts.append(f'<circle cx="{fx + 5}" cy="{fy - 4}" r="4.5" fill="{MUTED}"/>')
         parts.append(t(fx + 16, fy, lang["name"], 12, INK, MONO))
         fx += 16 + text_width(lang["name"], "mono400", 12) + 18
     parts.append(t(fx, fy, f"★ {repo.get('stargazerCount', 0)}", 12, MUTED, MONO))
@@ -712,9 +712,9 @@ def main() -> None:
     cards = {
         "hero.svg": hero(profile, portrait),
         "graph.svg": graph(stats),
-        "tile-contributions.svg": tile("CONTRIBUIÇÕES", stats["total"], "no último ano", CYAN, T_TILES),
-        "tile-repos.svg": tile("REPOSITÓRIOS", stats["public_repos"], "públicos", YELLOW, T_TILES + 0.15),
-        "tile-streak.svg": tile("MAIOR SEQUÊNCIA", stats["longest_streak"], "dias seguidos", VIOLET, T_TILES + 0.3),
+        "tile-contributions.svg": tile("CONTRIBUIÇÕES", stats["total"], "no último ano", ACCENT, T_TILES),
+        "tile-repos.svg": tile("REPOSITÓRIOS", stats["public_repos"], "públicos", ACCENT, T_TILES + 0.15),
+        "tile-streak.svg": tile("MAIOR SEQUÊNCIA", stats["longest_streak"], "dias seguidos", ACCENT, T_TILES + 0.3),
         "activity.svg": activity(stats),
         "stack.svg": stack(profile),
     }
