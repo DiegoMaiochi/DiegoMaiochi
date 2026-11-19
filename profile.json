@@ -1,0 +1,22 @@
+{
+  "username": "DiegoMaiochi",
+  "name": "Diego Maiochi",
+  "greeting": "Olá, eu sou",
+  "role": "Desenvolvedor front-end",
+  "tagline": "Interfaces modernas e soluções que facilitam a vida das pessoas.",
+  "code_line": "const diego = { café: 'sempre', aprendendo: true };",
+  "stack": [
+    { "name": "React", "color": "#38BDF8" },
+    { "name": "JavaScript", "color": "#FACC15" },
+    { "name": "Tailwind CSS", "color": "#2DD4BF" },
+    { "name": "Git", "color": "#F97316" },
+    { "name": "APIs REST", "color": "#A78BFA" },
+    { "name": "Postman", "color": "#FB7185" }
+  ],
+  "featured_repos": [
+    "AgentStudio",
+    "Sistema-de-Assinatura",
+    "SerafinConnect",
+    "Landing-Page-Pizzaria"
+  ]
+}
